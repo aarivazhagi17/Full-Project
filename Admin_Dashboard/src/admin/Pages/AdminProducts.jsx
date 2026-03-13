@@ -1,0 +1,103 @@
+import React, { useState, useEffect } from "react";
+import "./AdminProducts.css";
+
+function AdminProducts() {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [image, setImage] = useState(null);
+  const [products, setProducts] = useState([]);
+
+
+const handleFetch = async () => {
+  try{
+    const response = await fetch("http://localhost:7000/products");
+    const data = await response.json();
+    setProducts(data);
+  }
+  catch(error){
+    console.log(error);
+  }
+}
+
+useEffect(() => {
+  handleFetch();
+}, []);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    try{
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("price", price);
+      formData.append("image", image);
+      if(image) formData.append("image", image);
+
+      const response = await fetch("http://localhost:7000/products", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      setProducts([...products, data]);
+      alert("Product added successfully!")
+      setName("");
+      setPrice("");
+      setImage(null);
+      
+    }
+    catch(error){
+      console.log(error);
+    }
+  handleFetch();
+  
+    
+  }
+  return (
+    <div className="admin-container">
+      <h1 className="admin-heading">💁‍♀️  Products</h1>
+
+      <form className="product-form" onSubmit={handleAdd}>
+        <input
+          type="text"
+          placeholder="Product Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="number"
+          placeholder="Product Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+
+        <input
+          type="file"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
+
+        <button type="submit">Add Product</button>
+      </form>
+
+      <div className="product-grid">
+        {products.map((product) => (
+          <div key={product.id} className="product-card">
+           
+            <img src={`http://localhost:7000/products/${product.image}`} alt="" />
+            <h3>{product.name}</h3>
+            <p>₹ {product.price}</p>
+
+            <button
+              className="delete-btn"
+              onClick={() => handleDelete(product.id)}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default AdminProducts;

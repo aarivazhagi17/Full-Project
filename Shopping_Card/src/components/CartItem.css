@@ -1,0 +1,10 @@
+.row{
+  display: flex;
+  align-items: center;
+     gap: 40px;
+      margin-bottom: 40px;
+       border:1px solid;
+        border-radius:5px; 
+        box-Shadow:3px 4px 5px rgb(18, 17, 17); 
+        padding:10px
+}

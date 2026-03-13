@@ -1,0 +1,102 @@
+.cart-item {
+    border:2px solid;
+    padding: 10px;
+    width: 70%;
+    height: 345px;
+    border-radius: 10px;
+    box-shadow: 2px 1px 4px rgb(18, 17, 17);
+    
+}
+
+.cart-item img {
+    width: 75%;
+    display: block;
+     margin: 0 auto;
+    border-radius: 10px;
+    height: 210px;
+}
+
+.product{
+    text-align: center;
+    font-weight: bold;
+    font-size: 21px;
+}
+
+.rate{
+    text-align: center;
+    margin-top: 20px;
+    font-size: 19px;
+}
+
+.buton{
+    margin-left: 130px;
+    margin-top: 10px;
+    padding: 5px;
+    font-weight: bold;
+    display: block;
+    margin: 0 auto;
+    border: 1px solid;
+    border-radius: 3px;  
+}
+
+.buton:hover{
+    background-color: gray;
+    color: white;
+}
+.buton:active{
+    background-color: rgb(244, 237, 237);
+    color: black;
+}
+
+.delivery{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border-radius: 20px;
+    box-shadow: 7px 4px 17px rgb(18, 17, 17);
+    margin-top: 80px;
+}
+.delivery_boy{
+    height: 500px;
+    width: 400px;
+    margin-left: 30px;
+}
+.delivery_items{
+    align-items: center;
+    font-size: 28px;
+    margin-top: 50px;
+}
+@media screen and (max-width:767px) {
+    .delivery{
+        grid-template-columns: 1fr;
+    }
+    .delivery_items{
+       text-align: center;
+    }
+    
+}
+.WhiteMan{
+    height: 430px;
+    margin-top: 30px;
+}
+.contact{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 7px 4px 17px rgb(18, 17, 17);
+    margin-top: 80px;
+}
+@media screen and (max-width:767px) {
+    .contact{
+        grid-template-columns: 1fr;
+    }
+}
+.contact h2{
+    color: rgb(8, 8, 143);
+    letter-spacing: 1px;
+
+}
+.Location{
+    height: 150px;
+    
+}
