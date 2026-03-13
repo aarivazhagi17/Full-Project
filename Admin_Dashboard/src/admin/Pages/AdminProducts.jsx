@@ -30,14 +30,15 @@ useEffect(() => {
       formData.append("name", name);
       formData.append("price", price);
       formData.append("image", image);
-      if(image) formData.append("image", image);
 
       const response = await fetch("http://localhost:7000/products", {
         method: "POST",
         body: formData,
+      
       });
 
       const data = await response.json();
+
       setProducts([...products, data]);
       alert("Product added successfully!")
       setName("");
@@ -49,9 +50,21 @@ useEffect(() => {
       console.log(error);
     }
   handleFetch();
-  
-    
   }
+
+  const handleDelete = async (id) => {
+    try{
+      await fetch(`http://localhost:7000/products/${id}`, {
+        method: "DELETE",
+      });
+      alert ("Product deleted successfully!");
+      handleFetch();
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
   return (
     <div className="admin-container">
       <h1 className="admin-heading">💁‍♀️  Products</h1>
@@ -80,16 +93,17 @@ useEffect(() => {
       </form>
 
       <div className="product-grid">
+       
         {products.map((product) => (
-          <div key={product.id} className="product-card">
+          <div key={product._id} className="product-card">
            
-            <img src={`http://localhost:7000/products/${product.image}`} alt="" />
+            <img src={`http://localhost:7000/uploads/${product.image}`} alt="" />
             <h3>{product.name}</h3>
             <p>₹ {product.price}</p>
 
             <button
               className="delete-btn"
-              onClick={() => handleDelete(product.id)}
+              onClick={() => handleDelete(product._id)}
             >
               Delete
             </button>

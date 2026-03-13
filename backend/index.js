@@ -1,78 +1,63 @@
 const express = require("express");
 const mongoose = require("mongoose");
-//admin Schema
 const fs = require("fs");
 const path = require("path");
-const Admin = require("./module/adminSchema.js");
-//User schema
-const User = require("./module/UserSchema.js");
-//Order schema
-const Order = require("./module/OrderSchema.js");
-//product schema
-const Product = require("./module/productSchema.js");
-
-require("dotenv").config();
-const app = express();
 const cors = require("cors");
-app.use(express.json());
-app.use(cors());
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+require("dotenv").config();
 
+// Schemas
+const Admin = require("./module/adminSchema.js");
+const User = require("./module/UserSchema.js");
+const Order = require("./module/OrderSchema.js");
+const Product = require("./module/productSchema.js");
 
-mongoose.connect(process.env.MONGO_URL)
-    .then(() => {
-        console.log("Connected to MongoDB");
-    })
-    .catch((error) => {
-        console.error("Error connecting to MongoDB:", error);
-    });
+const app = express();
 
-    //multer
+app.use(express.json());
+app.use(cors());
 
-    const storage = multer.diskStorage({
-        destination: function (req, file, cb) {
-          cb(null, 'uploads/');
-        },
-        filename: function (req, file, cb) {
-          cb(null, Date.now() + '-' + file.originalname);
-        }
-      });
-      
-      const upload = multer({ storage: storage });
-    
+/* ===============================
+   MongoDB Connection
+================================*/
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.log("❌ MongoDB Error:", err));
 
+/* ===============================
+   Create uploads folder if missing
+================================*/
+const uploadDir = "uploads";
 
-//Admin page login setup    
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
-app.post("/register", async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const user = await Admin.create({ username, password });
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-})
+/* ===============================
+   Static Folder for Images
+================================*/
+app.use("/uploads", express.static("uploads"));
 
+/* ===============================
+   Multer Storage Setup
+================================*/
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
 
-app.post("/login", async (req, res) => {
-    const { username, password } =req.body
-    Admin.findOne({ username })
-    .then((user) => {
-       if(username === user.username && password === user.password){
-        const token = jwt.sign({ username},"secretKey",{expiresIn:"1h"});
-        res.status(200).json({ token });
-       }
-       else{
-        res.status(400).json({ error: "Invalid credentials" });
-       }
-    })
-    .catch((error) => {
-        res.status(400).json({ error: error.message });
-    });
-})
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
+const upload = multer({ storage });
+
+/* ===============================
+   JWT Token Middleware
+================================*/
 function verifyToken(req, res, next) {
   const token = req.headers.authorization;
 
@@ -82,79 +67,170 @@ function verifyToken(req, res, next) {
 
   jwt.verify(token, "secretKey", (err, decoded) => {
     if (err) return res.status(401).json({ message: "Invalid Token" });
+
+    req.user = decoded;
     next();
   });
 }
 
-app.get("/admin-data", verifyToken, (req, res) => {
-  res.json({ message: "Protected Data" });
+/* ===============================
+   ADMIN REGISTER
+================================*/
+app.post("/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const admin = await Admin.create({ username, password });
+
+    res.status(201).json(admin);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
+/* ===============================
+   ADMIN LOGIN
+================================*/
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-//User page register setup data
+    const user = await Admin.findOne({ username });
 
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (password !== user.password) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
+
+    const token = jwt.sign({ username }, "secretKey", { expiresIn: "1h" });
+
+    res.status(200).json({ token });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/* ===============================
+   PROTECTED ADMIN DATA
+================================*/
+app.get("/admin-data", verifyToken, (req, res) => {
+  res.json({ message: "Protected Admin Data" });
+});
+
+/* ===============================
+   USER REGISTER
+================================*/
 app.post("/user-register", async (req, res) => {
-    try{
-        const {name, email, password} = req.body;
-        const user = await User.create({name, email, password});
-        res.status(201).json(user);
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-    
-})
+  try {
+    const { name, email, password } = req.body;
 
+    const user = await User.create({ name, email, password });
 
-//Order connect pandra data
+    res.status(201).json(user);
 
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/* ===============================
+   ORDER APIs
+================================*/
 app.post("/orders", async (req, res) => {
-  const { name, phone, address } = req.body;
+  try {
+    const { name, phone, address } = req.body;
 
-  const newOrder = new Order({
-    name,
-    phone,
-    address,
-    userId: "USER" + Date.now()
-  });
+    const newOrder = new Order({
+      name,
+      phone,
+      address,
+      userId: "USER" + Date.now(),
+    });
 
-  await newOrder.save();
-  res.json({ message: "Order saved" });
+    await newOrder.save();
+
+    res.json({ message: "Order saved successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.get("/orders", async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
-  res.json(orders);
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+
+    res.json(orders);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-//product page connect data
+/* ===============================
+   PRODUCT APIs
+================================*/
 
+/* ADD PRODUCT */
 app.post("/products", upload.single("image"), async (req, res) => {
+  try {
     const { name, price } = req.body;
-    const image = req.file.path;
-  
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Image upload required" });
+    }
+
+    const image = req.file.filename;
+
     const newProduct = new Product({
-      image,
       name,
-      price
+      price,
+      image,
     });
-  
+
     await newProduct.save();
-    res.json({ message: "Product saved" });
-  });
 
-  app.get("/products", async (req, res) => {
+    res.json({ message: "Product added successfully" });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/* GET PRODUCTS */
+app.get("/products", async (req, res) => {
+  try {
     const products = await Product.find();
+
     res.status(200).json(products);
-  });
 
-  app.delete("/products/:id", async (req, res) => {
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/* DELETE PRODUCT */
+app.delete("/products/:id", async (req, res) => {
+  try {
     const productId = req.params.id;
+
     await Product.findByIdAndDelete(productId);
-    res.json({ message: "Product deleted" });
-  });
 
+    res.json({ message: "Product deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/* ===============================
+   SERVER START
+================================*/
 app.listen(process.env.PORT, () => {
-        console.log(`Server is running on port ${process.env.PORT}`)
-    });
-
+  console.log(`🚀 Server running on port ${process.env.PORT}`);
+});
