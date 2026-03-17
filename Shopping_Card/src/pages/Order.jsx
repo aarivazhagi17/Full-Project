@@ -10,27 +10,36 @@ function Order() {
 
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    alert("Order Confirmed 🎉");
+  e.preventDefault();
 
-  
-    const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+  const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
 
-const totalPrice = cartItems.reduce(
-  (total,item)=> total + item.price,
-  0
-);
+  const totalPrice = cartItems.reduce(
+    (total, item) => total + item.price,
+    0
+  );
 
-const orderData = {
-  name,
-  phone,
-  address,
-  items: cartItems,
-  total: totalPrice,
-  data: new Date().toLocaleString()
-};  
-await axios.post("http://localhost:7000/orders", orderData);
+  const orderData = {
+    name,
+    phone,
+    address,
+    items: cartItems,
+    total: totalPrice,
+    date: new Date().toLocaleString()
   };
+
+  try {
+    await axios.post("http://localhost:7000/orders", orderData);
+
+    alert("Order Confirmed 🎉");
+    localStorage.removeItem("cart"); // ✅ optional
+    navigate("/OrdersPage");
+
+  } catch (err) {
+    console.log("ORDER ERROR:", err.response?.data);
+    alert("Order failed ❌");
+  }
+};
 
   return (
     <div className="order-container">

@@ -1,23 +1,19 @@
 const mongoose = require("mongoose");
 
-const orderSchema = new mongoose.Schema({
-  name: String,
-  phone: String,
-  address: String,
+const orderSchema = new mongoose.Schema({ 
+    name: String,
+    phone: String,
+    address: String,
   date: String,
 
-  items:[
-    {
-      image: String,
-      name: String,
-      price: Number
-    }
-  ],
+  items: Array,
   total: Number,
-  status:{
+
+  status: {
     type: String,
-    default: "pending"
-  },
+    enum: ["Pending", "Accepted", "Preparing", "Delivered", "Rejected"],
+    default: "Pending"
+  }
 },
   { timestamps: true }
 );

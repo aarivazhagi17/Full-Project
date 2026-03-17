@@ -143,16 +143,20 @@ app.post("/user-register", async (req, res) => {
 app.post("/orders", async (req, res) => {
   try {
      const order = new Order({
-       name: req.body.name,
+       name : req.body.name,
        phone: req.body.phone,
        address: req.body.address,
        date: req.body.date,
-       status:"pending"
+       items: req.body.items,
+       total: req.body.total,
+       status:"Pending"
+
      });
      const saveOrder =await order.save();
      res.json(saveOrder);
 
   } catch (error) {
+    console.log("ORder ERror:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -168,6 +172,22 @@ app.get("/orders", async (req, res) => {
   }
 });
 
+//admin update order
+
+app.put("/orders/:id", async (req, res) => {
+ 
+  try{
+    const order = await Order.findById(req.params.id);
+    order.status = req.body.status;
+    await order.save();
+    res.json({
+      message:"Order Status Updated"
+    })
+  }
+  catch(error){
+    res.status(500).json({ error: error.message });
+  }
+})
 /* ===============================
    PRODUCT APIs
 ================================*/

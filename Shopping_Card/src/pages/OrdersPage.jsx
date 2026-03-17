@@ -29,11 +29,11 @@ function OrdersPage() {
 <p className="order-date">
 Date: {new Date(order.createdAt).toLocaleString()}
 </p>
-
+{/* mistake not product show */}
 {order.items?.map((item,i)=>(
 <div className="order-item" key={i}>
 
-<img className="order-image" src={item.image} alt={item.name}/>
+<img src={`http://localhost:7000/uploads/${item.image}`} alt={item.name} />
 
 <p className="order-name">{item.name} - ${item.price}</p>
 

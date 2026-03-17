@@ -3,7 +3,7 @@ import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import CartItem from '../components/CartItem';
 import { useNavigate } from "react-router-dom";
-import {useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import './CartPage.css';
 
@@ -31,6 +31,7 @@ useEffect(() => {
 
   if (items.length === 0) {
     alert("Cart is empty. Please add products!");
+    navigate("/ProductList");
     return;
   }
 
