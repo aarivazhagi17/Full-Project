@@ -32,7 +32,7 @@ const Navbar = () => {
 
         <li data-aos="fade-down" data-aos-delay="300">
           <NavLink to="/OrdersPage" className="nav-link">
-            Orders
+            Orders History
           </NavLink>
         </li>
 

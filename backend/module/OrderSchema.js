@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({ 
+  date: String,
+  items: Array,
+  total: Number,
+
+  customerDetails:{
     name: String,
     phone: String,
     address: String,
-  date: String,
-
-  items: Array,
-  total: Number,
+  },
 
   status: {
     type: String,

@@ -3,13 +3,14 @@ import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import CartItem from '../components/CartItem';
 import { useNavigate } from "react-router-dom";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import './CartPage.css';
 
 function CartPage() {
   const navigate = useNavigate();
   const { items, total, setProduct } = useCart();
+  // const [orders,serOrders] = useState([]);
 
 
  const handleFetch = async () => {
@@ -26,6 +27,20 @@ function CartPage() {
 useEffect(() => {
   handleFetch();
 }, []);
+
+// const handleFetchOrder = async () => {
+//   try{
+//     const response = await fetch("http://localhost:7000/orders");
+//     const data = await response.json();
+//     serOrders(data);
+//   }
+//   catch(error){
+//     console.log(error);
+//   }
+// }
+// useEffect(()=>{
+//   handleFetchOrder();
+// })
 
   const handleOrder = () => {
 

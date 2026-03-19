@@ -4,9 +4,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Order() {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [details, setDetails]=useState({
+    name:"",
+    phone:"",
+    address:""
+  });
 
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
@@ -20,19 +22,17 @@ function Order() {
   );
 
   const orderData = {
-    name,
-    phone,
-    address,
+    customerDetails:details,
     items: cartItems,
     total: totalPrice,
     date: new Date().toLocaleString()
   };
 
   try {
-    await axios.post("http://localhost:7000/orders", orderData);
+    await axios.post("http://localhost:7000/orders",orderData);
 
     alert("Order Confirmed 🎉");
-    localStorage.removeItem("cart"); // ✅ optional
+    localStorage.removeItem("cart");
     navigate("/OrdersPage");
 
   } catch (err) {
@@ -51,25 +51,22 @@ function Order() {
           type="text"
           name="name"
           placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setDetails({...details,name:e.target.value})}
           required
         />
 
         <input
-          type="tel"
+          type="text"
           name="phone"
           placeholder="Enter phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) => setDetails({...details,phone:e.target.value})}
           required
         />
 
         <input
           name="address"
           placeholder="Enter delivery address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          onChange={(e) => setDetails({...details,address:e.target.value})}
           required
         />
 

@@ -19,19 +19,18 @@ function AdminOrders() {
       })
       .catch(err => console.log(err));
   }, []);
-  useEffect(() => {
-    axios.put("http://localhost:7000/orders:status")
-      .then(res => { setOrders(res.data) }
-      )
-  }, []);
 
   const updateStatus = (orderId, newStatus) => {
     axios.put(`http://localhost:7000/orders/${orderId}`, { status: newStatus })
       .then(res => {
-        setOrders(prevOrders => prevOrders.map(order => order._id === orderId ? { ...order, status: newStatus } : order));
+        setOrders(prevOrders =>
+           prevOrders.map(order =>
+             order._id === orderId 
+             ? { ...order, status: newStatus }
+             : order));
       })
       .catch(err => console.log(err));
-  };
+  };  
   return (
     <div className="admin-orders">
       <h2>All Orders</h2>
@@ -40,23 +39,25 @@ function AdminOrders() {
         {orders.length === 0 && (<p>No orders yet</p>)}
         {orders.map(order => (
           <div key={order._id} className="order-card">
-            <p>Name: {order.name}</p>
-            <p>Phone: {order.phone}</p>
-            <p>Address: {order.address}</p>
+            <p>Customer: {order.customerDetails?.name}</p>
+            <p>Phone: {order.customerDetails?.phone}</p>
+            <p>Address: {order.customerDetails?.address}</p>
             <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
 
             {/* PRoduct LiSt mistake iruku show agala*/}
             <div className="product-list">
               <h4>Products : </h4>
 
-              {order.items.map((item) => (
-                <div key={item._id} className="product-item">
+              {order.items?.map((item,index) => (
+                <div key={index} className="product-item">
 
                   <img src={`http://localhost:7000/uploads/${item.image}`} alt={item.name} width="40" />
 
                   <span>{item.name}</span>
 
                   <span>${item.price}</span>
+
+                  <span>Quantity: {item.quantity}</span>
 
                 </div>
               ))}

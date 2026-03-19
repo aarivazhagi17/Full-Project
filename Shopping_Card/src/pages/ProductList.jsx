@@ -1,6 +1,6 @@
 import React from 'react';
 import ProductCard from '../components/ProductCard';
-import '../components/Product.css';
+import './ProductList.css';
 
 //image
 import Delivery from '../assets/Items/Delivery.jpg'

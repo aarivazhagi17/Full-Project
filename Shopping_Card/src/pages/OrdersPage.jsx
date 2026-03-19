@@ -30,21 +30,23 @@ function OrdersPage() {
 Date: {new Date(order.createdAt).toLocaleString()}
 </p>
 {/* mistake not product show */}
-{order.items?.map((item,i)=>(
-<div className="order-item" key={i}>
-
-<img src={`http://localhost:7000/uploads/${item.image}`} alt={item.name} />
-
-<p className="order-name">{item.name} - ${item.price}</p>
-
-</div>
+{order.items.map((item) => (
+  <div className="order-item" key={item._id}>
+    <img
+      src={`http://localhost:7000/uploads/${item.image}`}
+      alt={item.name}
+      className="order-image"
+    />
+    <div className="order-details">
+      <p className="order-name">{item.name}</p>
+      <p className="order-price">${item.price}</p>
+    </div>
+  </div>
 ))}
-
-<strong className="order-total">Total: ${order.total}</strong>
-
-<span className={`status ${order.status}`}>
+<h4>Total: ${order.total}</h4>
+<button className={`status ${order.status}`}>
 {order.status}
-</span>
+</button>
 
 </div>
 ))}

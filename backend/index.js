@@ -143,11 +143,9 @@ app.post("/user-register", async (req, res) => {
 app.post("/orders", async (req, res) => {
   try {
      const order = new Order({
-       name : req.body.name,
-       phone: req.body.phone,
-       address: req.body.address,
-       date: req.body.date,
        items: req.body.items,
+       date: req.body.date,
+       customerDetails: req.body.customerDetails,
        total: req.body.total,
        status:"Pending"
 
